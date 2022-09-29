@@ -1,0 +1,146 @@
+import random
+
+# `Number_of_decks` can be any number, but choosing a large number ensures you can play many (here, up to 1000) times without the game ending since we run out of cards
+number_of_decks = 1000
+deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] * number_of_decks
+
+
+# Function to deal the deck
+def deal(deck):
+    hand = []
+    for i in range(2):
+        random.shuffle(deck)
+        card = deck.pop()
+        if card == 11:
+            card = "Jack"
+        if card == 12:
+            card = "Queen"
+        if card == 13:
+            card = "King"
+        if card == 1:
+            card = "Ace"
+        hand.append(card)
+    return hand
+
+
+# So the player can play more than once if they want
+def play_again():
+    again = input("Do you want to play again? Respond with 'y' for yes or 'n' for no: ").casefold()
+    if again == "y":
+        dealer_hand = []
+        player_hand = []
+        deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] * number_of_decks
+        game()
+    else:
+        print("Thank you, come again!")
+        exit()
+
+
+def total(hand):
+    current_total = 0
+    for card in hand:
+        if card == "Jack" or card == "Queen" or card == "King":
+            current_total += 10
+        elif card == "Ace":
+            if current_total > 10:
+                current_total += 1
+            else:
+                current_total += 11
+        else:
+            current_total += card
+    return current_total
+
+
+# Defining the cards
+def hit(hand):
+    current_card = deck.pop()
+    if current_card == 11:
+        current_card = "Jack"
+    if current_card == 12:
+        current_card = "Queen"
+    if current_card == 13:
+        current_card = "King"
+    if current_card == 1:
+        current_card = "Ace"
+    hand.append(current_card)
+    return hand
+
+
+def print_results(dealer_hand, player_hand):
+    print("The dealer has the cards: " + str(dealer_hand) + " for a total of " + str(total(dealer_hand)))
+    print("You have the cards: " + str(player_hand) + " for a total of " + str(total(player_hand)))
+
+
+# Adding true blackjack (21) outcomes: note that if the player has 21 they win automatically
+def blackjack(dealer_hand, player_hand):
+    if total(player_hand) == 21:
+        print_results(dealer_hand, player_hand)
+        print("Congratulations! You got a Blackjack!\n")
+        play_again()
+    elif total(dealer_hand) == 21:
+        print_results(dealer_hand, player_hand)
+        print("Sorry, you lose. The dealer got a blackjack.\n")
+        play_again()
+
+
+
+
+
+# Adding the possible outcomes
+def score(dealer_hand, player_hand):
+    if total(player_hand) == 21 and total(dealer_hand) != 21:
+        print_results(dealer_hand, player_hand)
+        print("You win! You have blackjack.\n")
+    elif total(player_hand) > total(dealer_hand):
+        print_results(dealer_hand, player_hand)
+        print("You beat the dealer!\n")
+    elif total(dealer_hand) > 21:
+        print_results(dealer_hand, player_hand)
+        print("You win! The dealer busted.\n")
+    elif total(dealer_hand) == 21 and total(player_hand) != 21:
+        print_results(dealer_hand, player_hand)
+        print("Sorry, you lost. The dealer has blackjack.\n")
+    elif total(player_hand) > 21:
+        print_results(dealer_hand, player_hand)
+        print("Sorry, you busted.\n")
+    elif total(player_hand) < total(dealer_hand):
+        print_results(dealer_hand, player_hand)
+        print("Sorry, you lost. The dealer's score is higher.\n")
+
+
+# Now I call the actual game:
+def game():
+    choice = 0
+    print ("WELCOME TO BLACKJACK!\n")
+    dealer_hand = deal(deck)
+    player_hand = deal(deck)
+    print ("The dealer is showing a " + str(dealer_hand[0]))
+    print ("You have a " + str(player_hand) + " for a total of " + str(total(player_hand)))
+    blackjack(dealer_hand, player_hand)
+    quit = False
+    while not quit:
+        choice = input("Do you want to Stand(s), Hit(h) or Quit(q): ").casefold()
+        if choice == 's':
+            while total(dealer_hand)<17:
+                hit(dealer_hand)
+                print(dealer_hand)
+                if total(dealer_hand)>21:
+                    print("You win! The dealer busted")
+                    play_again()
+            score(dealer_hand,player_hand)
+            play_again()
+        if choice == 'h':
+            hit(player_hand)
+            print(player_hand)
+            if total(player_hand)>21:
+                print("Sorry, you lost. You busted.")
+                play_again()
+
+        elif choice == "q":
+            print("Thank you, come again!")
+            quit = True
+            exit()
+
+
+if __name__ == "__main__":
+    game()
